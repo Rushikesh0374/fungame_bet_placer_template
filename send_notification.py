@@ -1,8 +1,12 @@
 import firebase_admin
 from firebase_admin import credentials, messaging
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # directory of the current file
+cred_path = os.path.join(BASE_DIR, 'cloud_messaging_credentials.json')
 
 # Initialize the Firebase Admin SDK (run once)
-cred = credentials.Certificate('./cloud_messaging_credentials.json')
+cred = credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred)
 
 def send_broadcast_message(topic: str, title: str, body: str):
