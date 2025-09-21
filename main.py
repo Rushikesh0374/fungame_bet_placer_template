@@ -63,7 +63,7 @@ class AutomateGame:
 
         if self.DRAW_NO == "R":
             if self.is_bet_placed_r and self.DRAW_NO == "R":
-                self.take_bet()
+                self.take_bet("R")
                 # self.place_bet()
             
             elif self.DRAW_NO == "R":
@@ -74,7 +74,7 @@ class AutomateGame:
 
         elif self.DRAW_NO == "B":
             if self.is_bet_placed_b and self.DRAW_NO == "B":
-                self.take_bet()
+                self.take_bet("B")
                 # self.place_bet()
             
             elif self.DRAW_NO == "B":
