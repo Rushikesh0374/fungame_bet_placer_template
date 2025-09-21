@@ -20,23 +20,25 @@ logging.basicConfig(
 
 class AutomateGame:
 
-    def __init__(self, total_amount, session_id, member_id, bet_amount, bet_on):
+    def __init__(self, total_amount, session_id, member_id, bet_amount):
         self.TOTAL_AMOUNT = total_amount
         self.SESSION_ID = session_id
         self.MEMBER_ID = member_id
         self.AB_VERSION = "R1.0.0.1"
         self.CCS_ID = "2000"
         self.STAMP_ID = 1
+        
         self.DRAW_NO = ""
         self.DRAW_CARD = ""
         self.BET_PLACED_DRAW_ID = ""
         self.BET_PLACED_DRAW_CARD = ""
-        self.is_pattern_found = False
-        self.is_bet_placed = False
+        self.is_pattern_found_r = False
+        self.is_pattern_found_b = False
+        self.is_bet_placed_r = False
+        self.is_bet_placed_b = False
         self.game_bet_ammount = bet_amount
         self.game_win_ammount = bet_amount*1.95
         self.win_amount = 0
-        self.bet_on = bet_on
 
         # This function should return (remaining_time, draw_id)
         self.REM_TIME, self.DRAWID = getAndharBaharLastStatus(
@@ -53,24 +55,38 @@ class AutomateGame:
         
 
     def check_pattern(self):
-        
-        if self.is_bet_placed and self.DRAW_NO == self.bet_on:
-            self.take_bet()
-            # self.place_bet()
-        
-        elif self.DRAW_NO == self.bet_on:
-            self.place_bet()
-        
-        else:
-            self.is_bet_placed = False
-        
+
+        # if draw no is r then check if bet placed already, if yes then take amount else 
+
+        if self.DRAW_NO == "R":
+            if self.is_bet_placed_r and self.DRAW_NO == "R":
+                self.take_bet()
+                # self.place_bet()
+            
+            elif self.DRAW_NO == "R":
+                self.place_bet()
+
+            if self.is_bet_placed_b:
+                self.is_bet_placed_b = False
+
+        elif self.DRAW_NO == "B":
+            if self.is_bet_placed_b and self.DRAW_NO == "B":
+                self.take_bet()
+                # self.place_bet()
+            
+            elif self.DRAW_NO == "B":
+                self.place_bet()
+
+            if self.is_bet_placed_r:
+                self.is_bet_placed_r = False
+            
 
 
-    def place_bet(self):
+    def place_bet(self, bet_on):
         temp_amount = self.TOTAL_AMOUNT - self.game_bet_ammount
         # For B pattern
 
-        if self.bet_on == "B":
+        if bet_on == "B":
             res = placeABBet(f"{self.SESSION_ID},{self.DRAWID},{self.STAMP_ID},{self.CCS_ID},{self.MEMBER_ID},{temp_amount:.2f},0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,{self.game_bet_ammount},0,0,0")
         else:
             res = placeABBet(f"{self.SESSION_ID},{self.DRAWID},{self.STAMP_ID},{self.CCS_ID},{self.MEMBER_ID},{temp_amount:.2f},0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,{self.game_bet_ammount},0,0,0,0")
@@ -78,10 +94,14 @@ class AutomateGame:
         
         if res == "OK":
             self.TOTAL_AMOUNT -= self.game_bet_ammount
-            self.is_bet_placed = True
             self.BET_PLACED_DRAW_ID = self.DRAWID
             self.STAMP_ID += 1
             file_path = "/home/ubuntu/my-api/data.json"
+
+            if bet_on == "B":
+                self.is_bet_placed_b = True
+            else:
+                self.is_bet_placed_r = True
 
             with open(file_path, "r+") as f:
                 # Acquire an exclusive lock — this will block until it's available
@@ -102,7 +122,10 @@ class AutomateGame:
 
             logging.info(f"BET PLACED SUCCESSFULLY  ---- AMOUNT - {self.TOTAL_AMOUNT}")
         else:
-            self.is_bet_placed = False
+            if bet_on == "B":
+                self.is_bet_placed_b = True
+            else:
+                self.is_bet_placed_r = True
 
 
     def take_bet(self):
@@ -154,7 +177,6 @@ if __name__ == "__main__":
     MEMBER_ID = os.environ.get("MEMBER_ID")
     LOGIN_ID  = os.environ.get("LOGIN_ID")
     BET_AMOUNT = os.environ.get("BET_AMOUNT")
-    BET_ON     = os.environ.get("BET_ON")
 
     # ---- Validate and type-cast ----
     if not MEMBER_ID or not LOGIN_ID:
@@ -165,15 +187,13 @@ if __name__ == "__main__":
     except (TypeError, ValueError):
         raise ValueError("BET_AMOUNT must be a number in environment.")
 
-    if not BET_ON:
-        raise ValueError("BET_ON must be set in environment (e.g. 'R' or 'B').")
 
     # ---- Login and start ----
     SESSION_ID, TOTAL_AMOUNT = login(LOGIN_ID)
     if not SESSION_ID or not TOTAL_AMOUNT:
         raise ValueError("Login failed: invalid session id or amount.")
 
-    AutomateGame(TOTAL_AMOUNT, SESSION_ID, MEMBER_ID, BET_AMOUNT, BET_ON)
+    AutomateGame(TOTAL_AMOUNT, SESSION_ID, MEMBER_ID, BET_AMOUNT)
 
     while True:
         time.sleep(1)
