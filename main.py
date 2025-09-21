@@ -6,6 +6,9 @@ from threading import Thread
 import time
 from termcolor import colored
 import logging
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(
