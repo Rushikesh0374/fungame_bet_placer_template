@@ -131,7 +131,7 @@ class AutomateGame:
                 self.is_bet_placed_r = True
 
 
-    def take_bet(self):
+    def take_bet(self, bet_on):
         self.win_amount += self.game_win_ammount
         temp_amount = self.TOTAL_AMOUNT + self.win_amount
         input_str = f"{self.SESSION_ID},{self.BET_PLACED_DRAW_ID},{self.STAMP_ID},{self.CCS_ID},{self.MEMBER_ID},{self.TOTAL_AMOUNT:.2f},3,1,{self.DRAW_CARD},{self.win_amount:.2f},0,0,0,{self.win_amount:.2f},0"
@@ -142,7 +142,11 @@ class AutomateGame:
             self.TOTAL_AMOUNT = temp_amount
             self.win_amount = 0
             self.STAMP_ID += 1
-            self.is_bet_placed = False
+            if bet_on == "B":
+                self.is_bet_placed_b = False
+            else:
+                self.is_bet_placed_r = False
+
             logging.info(f"Successfully Received the Winning Amount {self.TOTAL_AMOUNT}")
 
     
