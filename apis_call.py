@@ -8,7 +8,7 @@ import random
 from request_body_templete import *
 import mail
 import logging
-from send_notification import send_broadcast_message
+# from send_notification import send_broadcast_message
 
 # Configure logging
 logging.basicConfig(
@@ -44,7 +44,7 @@ def retry_with_backoff(func, *args, max_retries=5, fixed_interval=1, **kwargs):
         except Exception as e:
             retries += 1
             if retries > max_retries:
-                send_broadcast_message(topic="all_users",title="Server Alert",body="Code has crashed, please check the server!")
+                # send_broadcast_message(topic="all_users",title="Server Alert",body="Code has crashed, please check the server!")
 
                 logging.error(f"Maximum retries ({max_retries}) exceeded. Last error: {str(e)}")
                	os._exit(1)
