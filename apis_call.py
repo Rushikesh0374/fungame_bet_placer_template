@@ -1,3 +1,4 @@
+
 import os
 import requests
 import re
@@ -8,7 +9,6 @@ import random
 from request_body_templete import *
 import mail
 import logging
-# from send_notification import send_broadcast_message
 
 # Configure logging
 logging.basicConfig(
@@ -47,7 +47,7 @@ def retry_with_backoff(func, *args, max_retries=5, fixed_interval=1, **kwargs):
                 # send_broadcast_message(topic="all_users",title="Server Alert",body="Code has crashed, please check the server!")
 
                 logging.error(f"Maximum retries ({max_retries}) exceeded. Last error: {str(e)}")
-               	os._exit(1)
+                os._exit(1)
             
             # logging.info(f"Retry {retries}/{max_retries} after error: {str(e)}. Waiting {fixed_interval}s")
             time.sleep(fixed_interval)
@@ -55,10 +55,10 @@ def retry_with_backoff(func, *args, max_retries=5, fixed_interval=1, **kwargs):
 
 def _login_request(encrypted_mem_id):
     """Internal function to make login request"""
-    url = "https://sev02.gigp.vip/GAAndroidSer/AndWsService.svc"
+    url = "https://sev03.gigp.vip/BasicAndr/AndWsService.svc"
 
     headers = {
-        "Content-Type": "application/soap+xml; charset=utf-8",
+        "Content-Type": "text/xml; charset=utf-8",
         "Host": "sev02.gigp.vip",
         "SOAPAction": "http://tempuri.org/IAndWsService/IGetLogin"
     }
@@ -67,8 +67,7 @@ def _login_request(encrypted_mem_id):
 
     response = requests.post(url, headers=headers, data=body)
     response.raise_for_status()
-
-    print(response.text)    
+    print(response.text)
     match = re.search(r'OK,([\d.]+),([\d.]+)', response.text)
     logging.info(f"Login response: {match.group(2)}, {float(match.group(2))}")
     if match:
@@ -90,9 +89,9 @@ def login(encrypted_mem_id):
 
 def _getAndharBaharLastStatus_request(input_str):
     """Internal function to make Andhar Bahar last status request"""
-    url = "https://sev04.gigp.vip/GAAndroidSer/AndWsService.svc"
+    url = "https://sev04.gigp.vip/BasicAndr/AndWsService.svc"
     headers = {
-        "Content-Type": "application/soap+xml; charset=utf-8",
+        "Content-Type": "text/xml; charset=utf-8",
         "Host": "sev04.gigp.vip",
         "SOAPAction": '"http://tempuri.org/IAndWsService/IGetAndharBaharLastStatus"'
     }
@@ -130,9 +129,9 @@ def getAndharBaharLastStatus(input_str):
     
 def _getAndharBaharDrawnoResult_request(input_str):
     """Internal function to make Andhar Bahar draw number request"""
-    url = "https://sev06.gigp.vip/GAAndroidSer/AndWsService.svc"
+    url = "https://sev06.gigp.vip/BasicAndr/AndWsService.svc"
     headers = {
-        "Content-Type": "application/soap+xml; charset=utf-8",
+        "Content-Type": "text/xml; charset=utf-8",
         "Host": "sev06.gigp.vip",
         "SOAPAction": "http://tempuri.org/IAndWsService/IGetAnharBaharDrawno"
     }
@@ -178,9 +177,9 @@ def getAndharBaharDrawnoResult(input_str):
 
 def _placeABBet_request(input_str):
     """Internal function to place Andhar Bahar bet"""
-    url = "https://sev06.gigp.vip/GAAndroidSer/AndWsService.svc"
+    url = "https://sev06.gigp.vip/BasicAndr/AndWsService.svc"
     headers = {
-        "Content-Type": "application/soap+xml; charset=utf-8",
+        "Content-Type": "text/xml; charset=utf-8",
         "Host": "sev06.gigp.vip",
         "SOAPAction": "http://tempuri.org/IAndWsService/IAndharBaharBetDataProcess"
     }
@@ -212,10 +211,10 @@ def placeABBet(input_str):
 def _takeABBet_request(input_str):
     """Internal function to take Andhar Bahar bet"""
     # Using the correct URL and host from the template
-    url = "https://sev06.gigp.vip/GAAndroidSer/AndWsService.svc"
+    url = "https://sev06.gigp.vip/BasicAndr/AndWsService.svc"
 
     headers = {
-        "Content-Type": "application/soap+xml; charset=utf-8",
+        "Content-Type": "text/xml; charset=utf-8",
         "Host": "sev06.gigp.vip",
         "SOAPAction": "http://tempuri.org/IAndWsService/IAndharBaharTakeDataProcess"
     }
@@ -241,5 +240,3 @@ def takeABBet(input_str):
     except Exception as error:
         logging.error(f"Error while taking bet amount after retries: {error}")
         return "ERROR"
-
-# 524216789,6655010,3,2000,GK00555068,759.00,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0
